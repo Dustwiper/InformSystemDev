@@ -1,0 +1,27 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.vcxproj.user
+
+# Build results
+Debug/
+Release/
+x64/
+x86/
+ipch/
+*.obj
+*.pch
+*.pdb
+*.log
+*.exe
+*.dll
+*.lib
+
+# CMake
+CMakeFiles/
+CMakeCache.txt
+cmake-build-*/
+
+# VS Code
+.vscode/
