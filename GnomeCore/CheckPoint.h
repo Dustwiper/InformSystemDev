@@ -28,25 +28,7 @@ void clearBuffer(void);
 void assignString(std::string& strValue);
 
 //функция проверки различного типа ввода
-template<typename T>
-void validateNumeric(T& variable) {
-    T input{};
-
-    while (true) {
-        std::cin >> input;
-
-        if (!std::cin.fail()) {
-            variable = input;
-            clearBuffer(); 
-            return;
-        }
-
-        std::cin.clear();
-        clearBuffer();      
-
-        std::cout << message.NUM_ERROR << std::endl;
-    }
-}
+int validateNumeric();
 
 std::filesystem::path validateFilePath(void);
 auto getPermissions(const std::filesystem::path& filePath) -> std::filesystem::perms;

@@ -32,7 +32,7 @@ void Program::manualInput(void){
 
 // Генерация последовательности
 void Program::generateSequence(void) {
-	auto low{ 0 }; auto high{ 0 };
+	auto low{0}; auto high{0};
 	auto elements{ 0 };
 	auto allowedElements{ 150 };
 
@@ -40,12 +40,16 @@ void Program::generateSequence(void) {
 
 	while (true) {
 		std::cout << "Введите нижнюю границу:" << std::endl;
-		validateNumeric(low);
+		low = validateNumeric();
 		std::cout << "Введите верхнюю границу:" << std::endl;
-		validateNumeric(high);
+		high = validateNumeric();
 		
-		if (high < low) { std::cout << message.RANGE_ERROR << std::endl; }
-		else { break; }
+		if (high < low) { 
+			std::cout << message.RANGE_ERROR << std::endl; 
+}
+		else { 
+			break; 
+		}
 	}
 
 	originalSequence = generateIntegrals(low, high, elements);
@@ -68,8 +72,8 @@ void Program::fileInput(void){
 		std::ifstream fileIn(filePath);
 		std::getline(fileIn, fileSequence);
 		fileIn.close();
-
 		originalSequence = parseSequence(fileSequence);
+
 		if (originalSequence.empty()) {
 			std::cout << message.ARRAY_ERROR << "Введите путь к файлу:" << std::endl;
 			continue;
@@ -125,7 +129,6 @@ void Program::writeFile(void){
 				continue;
 			}
 		}
-
 		break;
 	}
 
@@ -229,16 +232,14 @@ std::vector<int> generateIntegrals(const int& min, const int& max, const int& qu
 }
 
 void validateElementsQuantity(int& elements, int maxElements){
+	std::cout << "Введите количество элементов (max 150):" << std::endl;
 	while (true) {
-		std::cout << "Введите количество элементов (max 150):" << std::endl;
-		validateNumeric(elements);
+		elements = validateNumeric();
 
-		if (elements <= 0 || elements > maxElements) {
-			std::cout << "Повторите попытку:"<< std::endl;
+		if (elements >= 1 && elements <= maxElements) {
+			return;
 		}
-		else {
-			break;
-		}
+		std::cout << "Повторите попытку:" << std::endl;
 	}
 }
 

@@ -47,6 +47,23 @@ std::filesystem::path validateFilePath(void) {
 	return filePath;
 }
 
+int validateNumeric() {
+	std::string variable;
+
+	while (true) {
+		std::cin >> variable;
+
+		if (matchRegExpr(regExpr::intPattern, variable)) {
+			clearBuffer();
+			return std::stoi(variable);
+		}
+
+		std::cout << message.NUM_ERROR << std::endl;
+		clearBuffer();
+
+	}
+}
+
 auto getPermissions(const std::filesystem::path& filePath) -> std::filesystem::perms{
 	std::filesystem::file_status fs{std::filesystem::status(filePath)};
 	return fs.permissions();

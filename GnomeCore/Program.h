@@ -8,7 +8,6 @@
 
 #include "CheckPoint.h"
 #include "GnomeSort.h"
-#include "GnomeSortTest.h"
 
 class Program {
 private:
@@ -36,7 +35,6 @@ std::vector<int> parseSequence(std::string& lineToParse);
 std::vector<int> generateIntegrals(const int& min, const int& max, const int& quantity);
 void validateElementsQuantity(int& elements, int maxElements);
 void clearVector(std::vector<int>& vec);
-bool validateFileSequence(const std::string& line);
 
 template <typename T>
 void output(std::vector<T>& sequence) {
