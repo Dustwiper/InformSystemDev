@@ -18,7 +18,6 @@ struct errorMessage {
 	std::string FILENF_ERROR{ "Файл не доступен или не найден!"};	
 	std::string ARRAY_ERROR{ "Неверный формат последовательности! " };
 	std::string COMMAND_ERROR{ "Комманда не найдена!" };
-
 };
 
 extern errorMessage message;

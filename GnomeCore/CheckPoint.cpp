@@ -35,10 +35,8 @@ std::filesystem::path validateFilePath(void) {
 		std::ofstream newFile(filePath);
 		newFile.close();
 	}
-
 	// Проверка бита на запрета на чтение и существование файла
-	while (!fileObject.is_regular_file())
-	{
+	while (!fileObject.is_regular_file()){
 		std::cout << message.FILENF_ERROR << " Повторите попытку: " << std::endl;
 		std::getline(std::cin, filePath);
 		fileObject.assign(filePath);
@@ -60,7 +58,6 @@ int validateNumeric() {
 
 		std::cout << message.NUM_ERROR << std::endl;
 		clearBuffer();
-
 	}
 }
 
