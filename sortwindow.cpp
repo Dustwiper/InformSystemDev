@@ -18,7 +18,6 @@
 #include <QBoxLayout>
 #include <QtSql/QSqlDatabase>
 
-// Имя соединения должно совпадать с тем, что используется в userdb.cpp
 static const char* kConnName = "qt_mysql_default";
 
 static QSqlDatabase getOpenedDb(QString *err = nullptr)
@@ -50,7 +49,7 @@ SortWindow::SortWindow(QWidget *parent)
     , ui(new Ui::SortWindow)
 {
     ui->setupUi(this);
-    commonInit(); // <-- ВОТ ЭТО и было нужно, чтобы кнопка сортировки работала
+    commonInit(); 
 }
 
 SortWindow::SortWindow(long long userId, const QString &login, QWidget *parent)
@@ -193,7 +192,7 @@ void SortWindow::ensureCapacity(int itemCount)
 
 int SortWindow::calcFilledCount() const
 {
-    // “плотно слева направо”: пока не встретили пустую ячейку
+   
     const int rows = ui->arrayTable->rowCount();
     const int cols = m_maxColumns;
 
