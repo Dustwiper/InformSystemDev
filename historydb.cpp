@@ -7,8 +7,7 @@
 
 // Преобразуем std::vector<int> в JSON-массив:
 // [1,2,3,...]
-QString vectorToJson(const std::vector<int>& v)
-{
+QString vectorToJson(const std::vector<int>& v){
     QJsonArray arr;                 // JSON-массив
     for (int x : v) arr.append(x);  // Добавляем все элементы
 
@@ -17,14 +16,16 @@ QString vectorToJson(const std::vector<int>& v)
 }
 
 // Преобразуем JSON-массив обратно в std::vector<int>
-bool jsonToVector(const QString& json, std::vector<int>* out)
-{
+bool jsonToVector(const QString& json, std::vector<int>* out){
     if (!out) return false;
     out->clear();
 
     const auto doc = QJsonDocument::fromJson(json.toUtf8()); // Парсим JSON
-    if (!doc.isArray()) return false;                         // Ожидаем массив
+    if (!doc.isArray()){
+        return false;
+    }
 
+    // Ожидаем массив
     const auto arr = doc.array();
     out->reserve(arr.size());
 
@@ -40,8 +41,7 @@ static bool isDuplicate(QSqlDatabase db,
                         long long userId,
                         const QString& orig,
                         const QString& sorted,
-                        QString* err)
-{
+                        QString* err){
     QSqlQuery q(db);
 
     // Ищем запись с тем же user_id + original_json + sorted_json
@@ -68,10 +68,10 @@ bool saveSortHistory(QSqlDatabase db,
                      long long userId,
                      const std::vector<int>& original,
                      const std::vector<int>& sorted,
-                     QString* err)
-{
+                     QString* err){
+
     if (!db.isValid() || !db.isOpen()) {
-        if (err) *err = "Database not open";
+        if (err) *err = "Ошибка открытия БД!";
         return false;
     }
 
@@ -85,7 +85,7 @@ bool saveSortHistory(QSqlDatabase db,
 
     QSqlQuery q(db);
 
-    // created_at ставим через NOW() в MySQL
+    // created_at через NOW() в MySQL
     q.prepare(R"(
         INSERT INTO sort_history(user_id, original_json, sorted_json, created_at)
         VALUES(:uid, :o, :s, NOW())
@@ -111,7 +111,7 @@ QVector<SortHistoryRow> loadSortHistory(QSqlDatabase db,
     QVector<SortHistoryRow> out;
 
     if (!db.isValid() || !db.isOpen()) {
-        if (err) *err = "Database not open";
+        if (err) *err = "Не удалось открыть базу данных!";
         return out;
     }
 
@@ -145,10 +145,9 @@ QVector<SortHistoryRow> loadSortHistory(QSqlDatabase db,
     return out;
 }
 
-bool clearSortHistory(QSqlDatabase db, long long userId, QString* err)
-{
+bool clearSortHistory(QSqlDatabase db, long long userId, QString* err){
     if (!db.isValid() || !db.isOpen()) {
-        if (err) *err = "Database not open";
+        if (err) *err = "Не удалось открыть базу данных!";
         return false;
     }
 

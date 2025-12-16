@@ -29,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent)
     // Инициализируем БД при старте, чтобы сразу увидеть проблему подключения
     QString dbErr;
     if (!initDb(&dbErr)) {
-        QMessageBox::warning(this, "DB open error", dbErr);
+        QMessageBox::warning(this, "Ошибка открытия базы данных!", dbErr);
     }
 }
 
@@ -59,13 +59,15 @@ void MainWindow::handleRegisterButton()
     if (!notEmptyFields()) {
         // Подсветим пустые поля
         if (ui->loginLine->text().trimmed().isEmpty()) ui->loginLine->setStyleSheet("border: 2px solid red;");
-        if (ui->passwordLine->text().isEmpty())        ui->passwordLine->setStyleSheet("border: 2px solid red;");
+        if (ui->passwordLine->text().isEmpty()){
+            ui->passwordLine->setStyleSheet("border: 2px solid red;");
+        }
         return;
     }
 
     QString dbErr;
     if (!initDb(&dbErr)) {
-        QMessageBox::warning(this, "DB open error", dbErr);
+        QMessageBox::warning(this, "Ошибка подключения к БД!", dbErr);
         return;
     }
 
@@ -75,13 +77,13 @@ void MainWindow::handleRegisterButton()
     long long newUserId = -1;
     QString err;
     if (!registerUser(login, pass, &newUserId, &err)) {
-        QMessageBox::warning(this, "Register error", err.isEmpty() ? "Не удалось зарегистрировать пользователя." : err);
+        QMessageBox::warning(this, "Ошибка регистрации", err.isEmpty() ? "Не удалось зарегистрировать пользователя!" : err);
         return;
     }
 
     QMessageBox::information(this, "OK", "Пользователь зарегистрирован.");
 
-    // ✅ После регистрации очищаем поля
+    //  После регистрации очищаем поля
     handleClearButton();
     ui->loginLine->setFocus();
 }
@@ -91,14 +93,18 @@ void MainWindow::handleEnterButton()
 {
     if (!notEmptyFields()) {
         // Подсветим пустые поля
-        if (ui->loginLine->text().trimmed().isEmpty()) ui->loginLine->setStyleSheet("border: 2px solid red;");
-        if (ui->passwordLine->text().isEmpty())        ui->passwordLine->setStyleSheet("border: 2px solid red;");
+        if (ui->loginLine->text().trimmed().isEmpty()){
+            ui->loginLine->setStyleSheet("border: 2px solid red;");
+        }
+        if (ui->passwordLine->text().isEmpty())       {
+            ui->passwordLine->setStyleSheet("border: 2px solid red;");
+        }
         return;
     }
 
     QString dbErr;
     if (!initDb(&dbErr)) {
-        QMessageBox::warning(this, "DB open error", dbErr);
+        QMessageBox::warning(this, "Ошибка открытия БД!", dbErr);
         return;
     }
 
@@ -109,9 +115,9 @@ void MainWindow::handleEnterButton()
     const AuthResult res = authUser(login, pass);
 
     if (!res.ok) {
-        QMessageBox::warning(this, "Auth error", res.error.isEmpty() ? "Неверный логин или пароль." : res.error);
+        QMessageBox::warning(this, "Ошибка аутентификации", res.error.isEmpty() ? "Неверный логин или пароль!" : res.error);
 
-        // ✅ При неудачном входе очищаем поля
+        // При неудачном входе очищаем поля
         handleClearButton();
         ui->loginLine->setFocus();
         return;

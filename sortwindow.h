@@ -29,6 +29,7 @@ private slots:
     void onHistoryClicked();
     void onClearHistoryClicked();
     void onItemChangedSequential(QTableWidgetItem *item);
+    void onHelpClicked();
 
 private:
     void commonInit();
@@ -58,6 +59,7 @@ private:
     bool m_internalChange = false; // если true — itemChanged игнорируем
 
     QPushButton* m_historyButton = nullptr; // создаём программно рядом с "Сгенерировать"
+    QPushButton* m_helpButton = nullptr;
 };
 
 #endif // SORTWINDOW_H

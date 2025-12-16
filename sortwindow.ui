@@ -75,7 +75,7 @@
        <item>
         <widget class="QPushButton" name="clearTable">
          <property name="text">
-          <string>Отчистить</string>
+          <string>Очистить</string>
          </property>
         </widget>
        </item>

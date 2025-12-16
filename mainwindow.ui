@@ -115,7 +115,7 @@
          <item>
           <widget class="QPushButton" name="clearButton">
            <property name="text">
-            <string>Отчистить</string>
+            <string>Очистить</string>
            </property>
           </widget>
          </item>
@@ -124,7 +124,7 @@
        <item>
         <widget class="QPushButton" name="registerButton">
          <property name="text">
-          <string>Зарегестрироваться</string>
+          <string>Зарегистрироваться</string>
          </property>
         </widget>
        </item>

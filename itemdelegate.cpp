@@ -4,15 +4,13 @@
 #include <QAbstractSpinBox>
 
 IntItemDelegate::IntItemDelegate(QObject *parent)
-    : QStyledItemDelegate(parent)
-{
+    : QStyledItemDelegate(parent){
     // Конструктор делегата — дополнительных настроек здесь не требуется
 }
 
 QWidget *IntItemDelegate::createEditor(QWidget *parent,
                                        const QStyleOptionViewItem &,
-                                       const QModelIndex &) const
-{
+                                       const QModelIndex &) const{
     // Создаём QSpinBox как редактор ячейки.
     // Так пользователь гарантированно вводит целое число, а не произвольный текст.
     auto *editor = new QSpinBox(parent);
@@ -27,11 +25,12 @@ QWidget *IntItemDelegate::createEditor(QWidget *parent,
     return editor;
 }
 
-void IntItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
-{
+void IntItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const{
     // Передаём текущее значение из ячейки в QSpinBox при начале редактирования
     auto *spin = qobject_cast<QSpinBox*>(editor);
-    if (!spin) return;
+    if (!spin){
+        return;
+    }
 
     bool ok = false;
     const int v = index.data(Qt::EditRole).toString().toInt(&ok); // Берём значение из модели
@@ -39,13 +38,14 @@ void IntItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index) c
 }
 
 void IntItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
-                                   const QModelIndex &index) const
-{
+                                   const QModelIndex &index) const{
     // Забираем значение из QSpinBox и записываем обратно в модель/таблицу
     auto *spin = qobject_cast<QSpinBox*>(editor);
-    if (!spin) return;
+    if (!spin){
+        return;
+    }
 
-    // Записываем в EditRole, чтобы у Qt было "правильное" число в модели.
+    // Записываем в EditRole, чтобы у Qt было число в модели.
     // Также Qt сама обновит отображение (DisplayRole).
     model->setData(index, spin->value(), Qt::EditRole);
 }

@@ -8,8 +8,8 @@
 #include <QAbstractSpinBox>
 
 DialogParams::DialogParams(QWidget *parent)
-    : QDialog(parent)
-{
+    : QDialog(parent){
+
     setWindowTitle("Параметры генерации массива"); // Заголовок окна диалога
     setModal(true);                                // Диалог модальный: пока не закрыт, главное окно не активно
 
@@ -59,7 +59,7 @@ DialogParams::DialogParams(QWidget *parent)
     // Проверка при нажатии OK (на всякий случай, если пользователь умудрился сделать некорректно)
     connect(buttons, &QDialogButtonBox::accepted, this, [this]() {
         if (m_min->value() >= m_max->value()) {
-            QMessageBox::warning(this, "Ошибка", "Минимум должен быть строго меньше максимума.");
+            QMessageBox::warning(this, "Ошибка", "Минимум должен быть строго меньше максимума!");
             return;
         }
         accept(); // Закрываем диалог с результатом Accepted

@@ -17,11 +17,15 @@
 #include <QSqlError>
 #include <QBoxLayout>
 #include <QtSql/QSqlDatabase>
+#include <QPlainTextEdit>
+#include <QTextBrowser>
+#include <QFile>
+#include <QCoreApplication>
 
 static const char* kConnName = "qt_mysql_default";
 
-static QSqlDatabase getOpenedDb(QString *err = nullptr)
-{
+static QSqlDatabase getOpenedDb(QString *err = nullptr){
+
     if (!QSqlDatabase::contains(kConnName)) {
         if (err) *err = "Соединение с БД не найдено (нет подключения '" + QString(kConnName) + "').";
         return QSqlDatabase();
@@ -46,31 +50,35 @@ static QSqlDatabase getOpenedDb(QString *err = nullptr)
 
 SortWindow::SortWindow(QWidget *parent)
     : QWidget(parent)
-    , ui(new Ui::SortWindow)
-{
+    , ui(new Ui::SortWindow){
+
     ui->setupUi(this);
+<<<<<<< HEAD
     commonInit(); 
+=======
+    commonInit();
+>>>>>>> 9fef26a (Changes to generation, labels, report formating. 'Help' function is added)
 }
 
 SortWindow::SortWindow(long long userId, const QString &login, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::SortWindow)
     , m_userId(userId)
-    , m_login(login)
-{
+    , m_login(login){
+
     ui->setupUi(this);
     commonInit();
 }
 
-void SortWindow::setUserContext(long long userId, const QString &login)
-{
+void SortWindow::setUserContext(long long userId, const QString &login){
+
     m_userId = userId;
     m_login = login;
 }
 
-void SortWindow::commonInit()
-{
-    // ---- таблица ----
+void SortWindow::commonInit(){
+
+    //таблица
     ui->arrayTable->setItemDelegate(new IntItemDelegate(ui->arrayTable));
 
     ui->arrayTable->setEditTriggers(
@@ -93,14 +101,13 @@ void SortWindow::commonInit()
     // старт: 1 строка, 8 столбцов
     resetTableToInitial();
 
-    // ---- кнопки из UI ----
+    // кнопки из UI
     connect(ui->clearTable, &QPushButton::released, this, &SortWindow::onClearClicked);
     connect(ui->generateArray, &QPushButton::released, this, &SortWindow::onGenerateClicked);
 
-    // ВАЖНО: это и есть кнопка сортировки из UI
     connect(ui->sort, &QPushButton::released, this, &SortWindow::onSortClicked);
 
-    // ---- кнопка "История" без UI, рядом с "Сгенерировать" ----
+    //  кнопка "История" без UI, рядом с "Сгенерировать"
     if (!m_historyButton) {
         QWidget* panel = ui->generateArray->parentWidget(); // topPanel
         if (panel && panel->layout()) {
@@ -116,6 +123,22 @@ void SortWindow::commonInit()
         }
     }
 
+    if (!m_helpButton) {
+        QWidget* panel = ui->generateArray->parentWidget(); // topPanel
+        if (panel && panel->layout()) {
+            if (auto* box = qobject_cast<QBoxLayout*>(panel->layout())) {
+                m_helpButton = new QPushButton("Справка", panel);
+
+                // вставляем после кнопки "История" (если она есть), иначе после "Сгенерировать"
+                int idx = m_historyButton ? box->indexOf(m_historyButton) : box->indexOf(ui->generateArray);
+                box->insertWidget(idx + 1, m_helpButton);
+
+                connect(m_helpButton, &QPushButton::released,
+                        this, &SortWindow::onHelpClicked);
+            }
+        }
+    }
+
     // ---- последовательный ввод ----
     connect(ui->arrayTable, &QTableWidget::itemChanged,
             this, &SortWindow::onItemChangedSequential);
@@ -123,8 +146,8 @@ void SortWindow::commonInit()
     setFocusToIndex(0);
 }
 
-void SortWindow::resetTableToInitial()
-{
+void SortWindow::resetTableToInitial(){
+
     m_internalChange = true;
     QSignalBlocker blocker(ui->arrayTable);
 
@@ -142,37 +165,38 @@ void SortWindow::resetTableToInitial()
     m_internalChange = false;
 }
 
-int SortWindow::rcToIndex(int r, int c) const
-{
+int SortWindow::rcToIndex(int r, int c) const{
+
     return r * m_maxColumns + c;
 }
 
-void SortWindow::indexToRC(int idx, int &r, int &c) const
-{
+void SortWindow::indexToRC(int idx, int &r, int &c) const{
+
     r = idx / m_maxColumns;
     c = idx % m_maxColumns;
 }
 
-int SortWindow::capacity() const
-{
+int SortWindow::capacity() const{
+
     return ui->arrayTable->rowCount() * m_maxColumns;
 }
 
-void SortWindow::ensureItem(int r, int c)
-{
+void SortWindow::ensureItem(int r, int c){
+
     if (!ui->arrayTable->item(r, c)) {
         ui->arrayTable->setItem(r, c, new QTableWidgetItem());
         ui->arrayTable->item(r, c)->setTextAlignment(Qt::AlignCenter);
     }
 }
 
-void SortWindow::ensureCapacity(int itemCount)
-{
+void SortWindow::ensureCapacity(int itemCount){
+
     if (itemCount < 1) itemCount = 1;
 
     const int needRows = (itemCount + m_maxColumns - 1) / m_maxColumns;
-    if (needRows <= ui->arrayTable->rowCount())
+    if (needRows <= ui->arrayTable->rowCount()){
         return;
+    }
 
     m_internalChange = true;
     QSignalBlocker blocker(ui->arrayTable);
@@ -190,9 +214,15 @@ void SortWindow::ensureCapacity(int itemCount)
     m_internalChange = false;
 }
 
+<<<<<<< HEAD
 int SortWindow::calcFilledCount() const
 {
    
+=======
+int SortWindow::calcFilledCount() const{
+
+    //пока не встретили пустую ячейку
+>>>>>>> 9fef26a (Changes to generation, labels, report formating. 'Help' function is added)
     const int rows = ui->arrayTable->rowCount();
     const int cols = m_maxColumns;
 
@@ -200,8 +230,12 @@ int SortWindow::calcFilledCount() const
     for (int r = 0; r < rows; ++r) {
         for (int c = 0; c < cols; ++c, ++idx) {
             auto *it = ui->arrayTable->item(r, c);
-            if (!it) return idx;
-            if (it->text().trimmed().isEmpty()) return idx;
+            if (!it){
+                return idx;
+            }
+            if (it->text().trimmed().isEmpty()){
+                return idx;
+            }
         }
     }
     return rows * cols;
@@ -210,7 +244,9 @@ int SortWindow::calcFilledCount() const
 bool SortWindow::tryReadFirstN(int n, std::vector<int> &out) const
 {
     out.clear();
-    if (n <= 0) return false;
+    if (n <= 0) {
+        return false;
+    }
 
     const int rows = ui->arrayTable->rowCount();
     const int cols = m_maxColumns;
@@ -219,14 +255,19 @@ bool SortWindow::tryReadFirstN(int n, std::vector<int> &out) const
     for (int r = 0; r < rows && idx < n; ++r) {
         for (int c = 0; c < cols && idx < n; ++c, ++idx) {
             auto *it = ui->arrayTable->item(r, c);
-            if (!it) return false;
+            if (!it){
+                return false;
+            }
 
             const QString s = it->text().trimmed();
-            if (s.isEmpty()) return false;
-
+            if (s.isEmpty()){
+                return false;
+            }
             bool ok = false;
             const int val = s.toInt(&ok);
-            if (!ok) return false;
+            if (!ok) {
+                return false;
+            }
 
             out.push_back(val);
         }
@@ -255,7 +296,10 @@ void SortWindow::writeFirstN(const std::vector<int> &v)
 
 void SortWindow::setFocusToIndex(int idx)
 {
-    if (idx < 0) idx = 0;
+    if (idx < 0){
+        idx = 0;
+    }
+
     ensureCapacity(idx + 1);
 
     int r = 0, c = 0;
@@ -267,9 +311,13 @@ void SortWindow::setFocusToIndex(int idx)
 
 void SortWindow::onItemChangedSequential(QTableWidgetItem *item)
 {
-    if (m_internalChange) return;
-    if (!item) return;
+    if (m_internalChange){
+        return;
+    }
+    if (!item){
 
+        return;
+    }
     const int r = item->row();
     const int c = item->column();
     const int idx = rcToIndex(r, c);
@@ -300,8 +348,7 @@ void SortWindow::onItemChangedSequential(QTableWidgetItem *item)
     }
 }
 
-void SortWindow::onClearClicked()
-{
+void SortWindow::onClearClicked(){
     resetTableToInitial();
     setFocusToIndex(0);
 }
@@ -309,8 +356,9 @@ void SortWindow::onClearClicked()
 void SortWindow::onGenerateClicked()
 {
     DialogParams dlg(this);
-    if (dlg.exec() != QDialog::Accepted)
+    if (dlg.exec() != QDialog::Accepted){
         return;
+    }
 
     const int mn = dlg.getMin();
     const int mx = dlg.getMax();
@@ -335,6 +383,7 @@ void SortWindow::onGenerateClicked()
         v.push_back(x);
     }
 
+    resetTableToInitial();   // отчищаем старые значения
     writeFirstN(v);
 
     m_nextIndex = qty;
@@ -364,17 +413,20 @@ void SortWindow::onSortClicked()
         QString err;
         auto db = getOpenedDb(&err);
         if (!err.isEmpty()) {
-            QMessageBox::warning(this, "DB", "Не удалось сохранить историю:\n" + err);
-        } else {
+            QMessageBox::warning(this, "БД", "Не удалось сохранить историю:\n" + err);
+        }
+        else {
             if (!saveSortHistory(db, m_userId, original, sorted, &err)) {
-                if (!err.isEmpty())
-                    QMessageBox::warning(this, "DB", "Не удалось сохранить историю:\n" + err);
+                if (!err.isEmpty()){
+                    QMessageBox::warning(this, "БД", "Не удалось сохранить историю:\n" + err);
+                }
             }
         }
     }
 
     setFocusToIndex(std::max(0, n - 1));
 }
+
 
 void SortWindow::onHistoryClicked()
 {
@@ -386,13 +438,13 @@ void SortWindow::onHistoryClicked()
     QString err;
     auto db = getOpenedDb(&err);
     if (!err.isEmpty()) {
-        QMessageBox::warning(this, "DB", "Не удалось открыть БД:\n" + err);
+        QMessageBox::warning(this, "БД", "Не удалось открыть БД:\n" + err);
         return;
     }
 
     const auto rows = loadSortHistory(db, m_userId, 200, &err);
     if (!err.isEmpty()) {
-        QMessageBox::warning(this, "DB", "Не удалось загрузить историю:\n" + err);
+        QMessageBox::warning(this, "БД", "Не удалось загрузить историю:\n" + err);
         return;
     }
 
@@ -404,18 +456,80 @@ void SortWindow::onHistoryClicked()
 
     auto *table = new QTableWidget(&dlg);
     table->setColumnCount(3);
-    table->setHorizontalHeaderLabels({"Дата", "Исходный массив", "Отсортированный массив"});
+    table->setHorizontalHeaderLabels({
+        "Дата",
+        "Исходный массив",
+        "Отсортированный массив"
+    });
     table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
+    // ─── helpers ────────────────────────────────────────────────
+    auto normalizeArrayText = [](QString s) {
+        // убираем [ ]
+        s.remove('[');
+        s.remove(']');
+
+        // нормализуем пробелы: "1,2,3" → "1, 2, 3"
+        s.replace(",", ", ");
+
+        // убираем двойные пробелы (на всякий случай)
+        while (s.contains("  "))
+            s.replace("  ", " ");
+
+        return s.trimmed();
+    };
+
+    auto makeArrayItem = [&](const QString& fullJson) -> QTableWidgetItem* {
+        const QString full = normalizeArrayText(fullJson);
+
+        QString shown = full;
+        const int limit = 140;
+        if (shown.size() > limit)
+            shown = shown.left(limit) + "...";
+
+        auto *it = new QTableWidgetItem(shown);
+        it->setToolTip(full); // полный текст с пробелами
+        it->setTextAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+        return it;
+    };
+    // ────────────────────────────────────────────────────────────
+
     table->setRowCount((int)rows.size());
     for (int i = 0; i < (int)rows.size(); ++i) {
-        table->setItem(i, 0, new QTableWidgetItem(rows[i].createdAt.toString("yyyy-MM-dd HH:mm:ss")));
-        table->setItem(i, 1, new QTableWidgetItem(rows[i].originalJson));
-        table->setItem(i, 2, new QTableWidgetItem(rows[i].sortedJson));
+        table->setItem(i, 0,
+                       new QTableWidgetItem(rows[i].createdAt.toString("yyyy-MM-dd HH:mm:ss")));
+        table->setItem(i, 1, makeArrayItem(rows[i].originalJson));
+        table->setItem(i, 2, makeArrayItem(rows[i].sortedJson));
     }
 
     layout->addWidget(table);
+
+    // Двойной клик — окно с полным массивом
+    connect(table, &QTableWidget::cellDoubleClicked, &dlg,
+            [table, this](int row, int col) {
+                if (col == 0) return;
+
+                auto *item = table->item(row, col);
+                if (!item) return;
+
+                const QString full =
+                    item->toolTip().isEmpty() ? item->text() : item->toolTip();
+
+                QDialog view(this);
+                view.setWindowTitle(col == 1
+                                        ? "Исходный массив"
+                                        : "Отсортированный массив");
+                view.resize(900, 500);
+
+                auto *lay = new QVBoxLayout(&view);
+                auto *edit = new QPlainTextEdit(&view);
+                edit->setReadOnly(true);
+                edit->setPlainText(full);
+
+                lay->addWidget(edit);
+                view.exec();
+            });
 
     auto *btnRow = new QHBoxLayout();
     auto *btnClear = new QPushButton("Очистить историю", &dlg);
@@ -428,7 +542,6 @@ void SortWindow::onHistoryClicked()
     layout->addLayout(btnRow);
 
     connect(btnClose, &QPushButton::clicked, &dlg, &QDialog::accept);
-
     connect(btnClear, &QPushButton::clicked, this, [this, table]() {
         onClearHistoryClicked();
         table->setRowCount(0);
@@ -437,9 +550,12 @@ void SortWindow::onHistoryClicked()
     dlg.exec();
 }
 
+
 void SortWindow::onClearHistoryClicked()
 {
-    if (m_userId <= 0) return;
+    if (m_userId <= 0){
+        return;
+    }
 
     const auto answer = QMessageBox::question(
         this,
@@ -449,19 +565,62 @@ void SortWindow::onClearHistoryClicked()
         QMessageBox::No
         );
 
-    if (answer != QMessageBox::Yes)
+    if (answer != QMessageBox::Yes){
         return;
+    }
 
     QString err;
     auto db = getOpenedDb(&err);
     if (!err.isEmpty()) {
-        QMessageBox::warning(this, "DB", "Не удалось открыть БД:\n" + err);
+        QMessageBox::warning(this, "БД", "Не удалось открыть БД:\n" + err);
         return;
     }
 
     if (!clearSortHistory(db, m_userId, &err)) {
-        if (!err.isEmpty())
-            QMessageBox::warning(this, "DB", "Не удалось очистить историю:\n" + err);
+        if (!err.isEmpty()){
+            QMessageBox::warning(this, "БД", "Не удалось очистить историю:\n" + err);
+        }
         return;
     }
 }
+
+void SortWindow::onHelpClicked()
+{
+    QDialog dlg(this);
+    dlg.setWindowTitle("Справка — как пользоваться приложением");
+    dlg.resize(860, 560);
+
+    auto *layout = new QVBoxLayout(&dlg);
+
+    auto *browser = new QTextBrowser(&dlg);
+    browser->setOpenExternalLinks(true);
+    browser->setReadOnly(true);
+
+    const QString helpPath = QCoreApplication::applicationDirPath() + "/help/help.html";
+
+    QFile f(helpPath);
+    if (f.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        browser->setHtml(QString::fromUtf8(f.readAll()));
+    } else {
+        browser->setHtml(
+            "<h2>Справка</h2>"
+            "<p>Не найден файл справки:</p>"
+            "<pre>" + helpPath.toHtmlEscaped() + "</pre>"
+                                         "<p>Создай папку <code>help</code> рядом с приложением и положи туда <code>help.html</code>.</p>"
+            );
+    }
+
+    layout->addWidget(browser);
+
+    auto *btnClose = new QPushButton("Закрыть", &dlg);
+    btnClose->setDefault(true);
+    connect(btnClose, &QPushButton::clicked, &dlg, &QDialog::accept);
+
+    auto *btnRow = new QHBoxLayout();
+    btnRow->addStretch();
+    btnRow->addWidget(btnClose);
+    layout->addLayout(btnRow);
+
+    dlg.exec();
+}
+
