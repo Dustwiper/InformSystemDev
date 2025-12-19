@@ -50,15 +50,12 @@ static QSqlDatabase getOpenedDb(QString *err = nullptr){
 
 SortWindow::SortWindow(QWidget *parent)
     : QWidget(parent)
-    , ui(new Ui::SortWindow){
-
+    , ui(new Ui::SortWindow)
+{
     ui->setupUi(this);
-<<<<<<< HEAD
-    commonInit(); 
-=======
     commonInit();
->>>>>>> 9fef26a (Changes to generation, labels, report formating. 'Help' function is added)
 }
+
 
 SortWindow::SortWindow(long long userId, const QString &login, QWidget *parent)
     : QWidget(parent)
@@ -214,15 +211,8 @@ void SortWindow::ensureCapacity(int itemCount){
     m_internalChange = false;
 }
 
-<<<<<<< HEAD
 int SortWindow::calcFilledCount() const
 {
-   
-=======
-int SortWindow::calcFilledCount() const{
-
-    //пока не встретили пустую ячейку
->>>>>>> 9fef26a (Changes to generation, labels, report formating. 'Help' function is added)
     const int rows = ui->arrayTable->rowCount();
     const int cols = m_maxColumns;
 
@@ -230,16 +220,13 @@ int SortWindow::calcFilledCount() const{
     for (int r = 0; r < rows; ++r) {
         for (int c = 0; c < cols; ++c, ++idx) {
             auto *it = ui->arrayTable->item(r, c);
-            if (!it){
-                return idx;
-            }
-            if (it->text().trimmed().isEmpty()){
-                return idx;
-            }
+            if (!it) return idx;
+            if (it->text().trimmed().isEmpty()) return idx;
         }
     }
     return rows * cols;
 }
+
 
 bool SortWindow::tryReadFirstN(int n, std::vector<int> &out) const
 {
